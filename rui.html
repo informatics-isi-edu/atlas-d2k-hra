@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>HuBMAP CCF Registration User Interface (CCF-RUI)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+  <link href="ccf-ui/rui/styles.css" rel="stylesheet">
+  <script src="ccf-ui/rui/wc.js" async></script>
+  <script>
+    const IN_IFRAME = window.self !== window.parent;
+
+    // fields that we are going to send to chaise
+    const FIELD_NAMES = {
+      FILE: 'hra_file',
+      ID: 'hra_id',
+      CREATOR: 'hra_creator',
+      ORGAN: 'hra_organ',
+      SEX: 'hra_sex',
+      ANNOTATIONS: 'hra_annotations'
+    }
+
+    // list of organs that we support.
+    const ORGAN_LOOKUP = {
+      'http://purl.org/ccf/latest/ccf.owl#VHFLeftKidneyV1.1': {
+        'rui': {
+          'name': 'kidney',
+          'side': 'left',
+          'sex': 'female'
+        },
+        'chaise': {
+          'name': 'UBERON:0004538',
+          'sex': 'Female'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHMLeftKidney': {
+        'rui': {
+          'name': 'kidney',
+          'side': 'left',
+          'sex': 'male'
+        },
+        'chaise': {
+          'name': 'UBERON:0004538',
+          'sex': 'Male'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHFRightKidneyV1.1': {
+        'rui': {
+          'name': 'kidney',
+          'side': 'right',
+          'sex': 'female'
+        },
+        'chaise': {
+          'name': 'UBERON:0004539',
+          'sex': 'Female'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHMRightKidney': {
+        'rui': {
+          'name': 'kidney',
+          'side': 'right',
+          'sex': 'male'
+        },
+        'chaise': {
+          'name': 'UBERON:0004539',
+          'sex': 'Male'
+        }
+      },
+      "http://purl.org/ccf/latest/ccf.owl#VHMProstate": {
+        'rui': {
+          'name': 'prostate',
+          'sex': 'male'
+        },
+        'chaise': {
+          'name': 'UBERON:0002367',
+          'sex': 'Male'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHFLeftUreter': {
+        'rui': {
+          'name': 'ureter',
+          'side': 'left',
+          'sex': 'female'
+        },
+        'chaise': {
+          'name': 'UBERON:0001223',
+          'sex': 'Female'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHMLeftUreter': {
+        'rui': {
+          'name': 'ureter',
+          'side': 'left',
+          'sex': 'male'
+        },
+        'chaise': {
+          'name': 'UBERON:0001223',
+          'sex': 'Male'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHFRightUreter': {
+        'rui': {
+          'name': 'ureter',
+          'side': 'right',
+          'sex': 'female'
+        },
+        'chaise': {
+          'name': 'UBERON:0001222',
+          'sex': 'Female'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHMRightUreter': {
+        'rui': {
+          'name': 'ureter',
+          'side': 'right',
+          'sex': 'Male'
+        },
+        'chaise': {
+          'name': 'UBERON:0001222',
+          'sex': 'Male'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHFUterus': {
+        'rui': {
+          'name': 'uterus',
+          'sex': 'female'
+        },
+        'chaise': {
+          'name': 'UBERON:0000995',
+          'sex': 'Female'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHFUrinaryBladder': {
+        'rui': {
+          'name': 'urinary bladder',
+          'sex': 'female'
+        },
+        'chaise': {
+          'name': 'UBERON:0001255',
+          'sex': 'Female'
+        }
+      },
+      'http://purl.org/ccf/latest/ccf.owl#VHMUrinaryBladder': {
+        'rui': {
+          'name': 'urinary bladder',
+          'sex': 'male'
+        },
+        'chaise': {
+          'name': 'UBERON:0001255',
+          'sex': 'Male'
+        }
+      }
+    };
+
+    /**
+     * expected data structure of content:
+     * {
+     *  values
+     * }
+     */
+    const configureRUI = (existingValue) => {
+      /**
+       * given that we have to fetch the file first, we cannot just inject ccf-rui from the start and we have
+       * to dynamically create an element and add it to body when everything is ready.
+       */
+      const rui = document.createElement("ccf-rui");
+
+      // where we've deployed this repository
+      const pathname = window.location.pathname;
+      rui.baseHref =  pathname.substring(0, pathname.lastIndexOf('/')) + '/ccf-ui/rui/' ;
+      // rui.baseHref = '/apps/hra/ccf-ui/rui/' ;
+
+      // hide the default header
+      rui.header = false;
+
+      rui.useDownload = !IN_IFRAME;
+      if (IN_IFRAME) {
+        rui.register = handleRegister;
+      }
+
+      if (existingValue && typeof existingValue[FIELD_NAMES.FILE] === 'string' && existingValue[FIELD_NAMES.FILE] !== '') {
+        fetchExistingData(existingValue[FIELD_NAMES.FILE], rui);
+      } else {
+        dataReady(rui);
+      }
+    }
+
+    /**
+     * this callback is called when users submit the form.
+     * it will take care of verification and sending data to the parent.
+     */
+    const handleRegister = (data) => {
+      const dataObject = JSON.parse(data);
+
+      // check the organ and make sure we're supporting it.
+      let organID;
+      if (dataObject['placement'] && dataObject['placement']['target']) {
+        organID = dataObject['placement']['target'];
+      }
+
+      if (!(organID in ORGAN_LOOKUP)) {
+        showAlert('error', 'Please select another organ. We currently do not support the chosen organ.');
+        return;
+      }
+
+      const organObject = ORGAN_LOOKUP[organID].chaise;
+
+      // turn the data into a file blob
+      const blob = new Blob([JSON.stringify(dataObject, null, 2)], { type: 'application/json' });
+      let fileName = 'HRA.json';
+      if (organID.indexOf('#') !== -1) {
+        fileName = 'HRA_' + organID.slice(organID.indexOf('#')+1) + '.json';
+      }
+      const file = new File([blob], fileName, { type: 'application/json' });
+
+      const submittedData = {};
+      submittedData[FIELD_NAMES.FILE] = file;
+      submittedData[FIELD_NAMES.ID] = dataObject['@id'];
+      submittedData[FIELD_NAMES.CREATOR] = dataObject['creator'];
+      submittedData[FIELD_NAMES.SEX] = organObject.sex;
+      submittedData[FIELD_NAMES.ORGAN] = organObject.name;
+
+      if (Array.isArray(dataObject['ccf_annotations']) && dataObject['ccf_annotations'].length > 0) {
+        // chaise expects the value to be a string that will parse to json
+        submittedData[FIELD_NAMES.ANNOTATIONS] = JSON.stringify(dataObject['ccf_annotations']);
+      } else {
+        // clear the value
+        submittedData[FIELD_NAMES.ANNOTATIONS] = '';
+      }
+
+      dispatchMessage('submit-data', submittedData);
+    }
+
+    /**
+     * if a value is already selected, we should fetch the file and
+     * get the json from it.
+     *
+     */
+    const fetchExistingData = (fileURL, rui) => {
+      fetch(fileURL).then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          console.log(response.body);
+          throw new Erorr('couldn\'t fetch the file');
+        }
+      }).then(data => {
+        // preselect the user info
+        if (data && data.creator_first_name && data.creator_last_name) {
+          rui.user = { firstName: data.creator_first_name, lastName: data.creator_last_name };
+        }
+
+        // preselect the organ
+        if (data && data.placement && data.placement.target) {
+          const org = ORGAN_LOOKUP[data.placement.target];
+          if (!org) {
+            showAlert('error', 'Please select another organ. We currently do not support the chosen organ.');
+          } else {
+            rui.organ = org.rui;
+          }
+        }
+
+        // preselect the registry
+        rui.editRegistration = data;
+      }).finally(() => {
+        dataReady(rui);
+      }).catch(err => {
+        console.log('couldn\'t fetch the existing file');
+        console.error(err);
+      })
+    }
+
+    /**
+     * should be called when iframe's data is ready
+     */
+     const dataReady = (rui) => {
+      dispatchMessage('iframe-data-ready');
+
+      // now that the data is ready, inject the rui element
+      document.body.appendChild(rui);
+    }
+
+    // ------------------------------- general functions --------------------------------- //
+
+    /**
+     * show an alert in the popup
+     * @param {'error'|'warning'|'success'|'info'} type type of the alert
+     * @param {string} message the message that will be displayed
+     */
+     const showAlert = (type, message) => {
+      dispatchMessage('show-alert', { type: type, message: message });
+    }
+
+    /**
+     * send a message to chaise. The available messages are:
+     *  - 'iframe-ready': When iframe is loaded and chaise can send data to it.
+     *  - 'iframe-data-ready': When iframe has fully loaded all data and chaise should stop showing the spinner.
+     *  - 'show-alert': for showing alerts in chaise.
+     *  - 'submit-data': for submitting data to chaise.
+     * @param {string} type the message type
+     * @param {object?} data the data (could be undefined)
+     * @returns
+     */
+    const dispatchMessage = (type, content) => {
+      if (!window.parent) {
+        if (content.message) {
+          console.log(content.message);
+        }
+        return;
+      }
+      window.parent.postMessage({ type: type, content: content }, window.location.origin);
+    }
+
+    /**
+     * recieve messages
+     */
+    window.addEventListener('message', (event) => {
+      if (event.origin !== window.location.origin) return;
+      const type = event.data.type;
+      const content = event.data.content;
+
+      switch (type) {
+        case 'initialize-iframe':
+          configureRUI(content);
+          break;
+      }
+
+    });
+
+    // let the parent know that the iframe is loaded and ready to recieve messages
+    window.addEventListener('DOMContentLoaded', () => {
+
+      if (IN_IFRAME) {
+        dispatchMessage('iframe-ready');
+      } else {
+        configureRUI();
+      }
+    });
+
+  </script>
+</head>
+
+<body class="mat-typography">
+  <!-- this element will be injected by the code above when everything is ready -->
+  <!-- <ccf-rui></ccf-rui> -->
+</body>
+
+</html>
