@@ -4,7 +4,7 @@
 CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
 CCF_UI_VERSION=3.7.2
 
-HRA_INSTALL_DIR=/var/wwww/html/apps/hra
+HRA_INSTALL_DIR=/var/www/html/apps/hra
 
 # the list of files that will be deployed
 RSYNC_FILE_LIST=ccf-ui \
