@@ -11,6 +11,8 @@
   <link href="ccf-ui-3.7.2/rui/styles.css" rel="stylesheet">
   <script src="ccf-ui-3.7.2/rui/wc.js" async></script>
   <script>
+    const CCF_UI_FOLDER = 'ccf-ui-3.7.2';
+
     const IN_IFRAME = window.self !== window.parent;
 
     // fields that we are going to send to chaise
@@ -170,8 +172,7 @@
 
       // where we've deployed this repository
       const pathname = window.location.pathname;
-      rui.baseHref =  pathname.substring(0, pathname.lastIndexOf('/')) + '/ccf-ui-3.7.2/rui/' ;
-      // rui.baseHref = '/apps/hra/ccf-ui/rui/' ;
+      rui.baseHref =  pathname.substring(0, pathname.lastIndexOf('/')) + '/' + CCF_UI_FOLDER + '/rui/' ;
 
       // hide the default header
       rui.header = false;
