@@ -8,8 +8,8 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
-  <link href="ccf-ui/rui/styles.css" rel="stylesheet">
-  <script src="ccf-ui/rui/wc.js" async></script>
+  <link href="ccf-ui-3.7.2/rui/styles.css" rel="stylesheet">
+  <script src="ccf-ui-3.7.2/rui/wc.js" async></script>
   <script>
     const IN_IFRAME = window.self !== window.parent;
 
@@ -170,7 +170,7 @@
 
       // where we've deployed this repository
       const pathname = window.location.pathname;
-      rui.baseHref =  pathname.substring(0, pathname.lastIndexOf('/')) + '/ccf-ui/rui/' ;
+      rui.baseHref =  pathname.substring(0, pathname.lastIndexOf('/')) + '/ccf-ui-3.7.2/rui/' ;
       // rui.baseHref = '/apps/hra/ccf-ui/rui/' ;
 
       // hide the default header

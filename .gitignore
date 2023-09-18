@@ -1,0 +1,14 @@
+**/.*.swp
+.DS_Store*
+.project
+._*
+.Spotlight-V100
+.Trashes
+.idea
+.idea/
+ehthumbs.db
+Thumbs.db
+
+ccf-ui*
+ccf-ui*.zip
+.make-*
