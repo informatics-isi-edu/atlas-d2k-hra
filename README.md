@@ -7,8 +7,8 @@ This repository has been created for integrating [ccf-ui](https://github.com/hub
 1. First you need to setup some environment variables. The following are the variables and their default values:
 
     ```sh
-    RELEASE_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
-    CCF_UI_FOLDER=ccf-ui-3.7.2
+    CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
+    CCF_UI_VERSION=3.7.2
 
     HRA_INSTALL_DIR=/var/wwww/html/apps/hra
     ```
@@ -16,7 +16,7 @@ This repository has been created for integrating [ccf-ui](https://github.com/hub
     -
     - If you're deploying remotely, since we're using the `HRA_INSTALL_DIR` in `rsync` command, you can use a remote location `username@host:public_html/` for this variable.
 
-2. The following command will download the `ccf-ui` based on the given link in `RELEASE_LINK` variable, and will unzip its content into the folder using `CCF_UI_FOLDER` name.
+2. The following command will download the `ccf-ui` based on the given link in `CCF_UI_ZIP_LINK` variable, and will unzip its content into the `ccf-ui` folder that the code relies on.
 
     ```sh
     make dist
@@ -24,7 +24,7 @@ This repository has been created for integrating [ccf-ui](https://github.com/hub
 
     Notes:
     - Make sure to run this command with the owner of the current folder. If you attempt to run this with a different user, it will complain.
-    - We will skip downloading if a folder with `CCF_UI_FOLDER` name already exists.
+    - `CCF_UI_VERSION` is used to find out which version of `ccf-ui` is currently installed. If you've already ran `make dist` before and havent' changed this variable, we will skip the download step. If you would like to force a download you should update this variable.
 
 3. To deploy the package, run the following:
 
@@ -41,14 +41,12 @@ If you would like to update the included ccf-ui, you should
 
 1. Find the version that you'd like from their [GitHub releases page](https://github.com/hubmapconsortium/ccf-ui/releases).
 2. Grab the link of `Source code (zip)`.
-3. Change the value of `RELEASE_LINK` in `Makefile` to be the link that you grabbed.
-4. Update `CCF_UI_FOLDER` value in `Makefile`. To make sure we're not downloading this file multiple time, you should include the version name in this value.
+3. Change the value of `CCF_UI_ZIP_LINK` in `Makefile` to be the link that you grabbed.
+4. Update `CCF_UI_VERSION` value in `Makefile`. We're using this version to make sure we're not downloading this file multiple times.
 5. Update the default values noted in the [deploying section](#deploying).
-6. Update the `.html` files to point to the new folder.
-   - In `rui.html`:
-      1. Update line 11 and 12.
-      2. Update line 14.
+6. Commit your changes and push.
 
+The build recipes will then pull the latest code and install the version that you noted in the Makefile.
 
 ## Help and Contact
 

@@ -1,17 +1,17 @@
 
 # update the following if you're planning to update to a new version
-# make sure the code is referring to the same folder name
-RELEASE_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
-CCF_UI_FOLDER=ccf-ui-3.7.2
+# make sure to also update the version variable
+CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
+CCF_UI_VERSION=3.7.2
 
 HRA_INSTALL_DIR=/var/wwww/html/apps/hra
 
 # the list of files that will be deployed
-RSYNC_FILE_LIST=${CCF_UI_FOLDER} \
+RSYNC_FILE_LIST=ccf-ui \
 	rui.html
 
-# check if the folder exists or not
-CCF_UI_FOLDER_EXISTS=$(shell [ -d "./${CCF_UI_FOLDER}" ] && echo 1 || echo 0)
+# the downloaded version of CCF_UI
+CCF_UI_DOWNLOADED_VERSION=$(shell [ -f .make-ccf-ui-version ] && cat .make-ccf-ui-version )
 
 # a function used for creating the rsync list file
 define add_array_to_file
@@ -20,22 +20,32 @@ define add_array_to_file
 	done
 endef
 
-.make-rsync-list:
-	$(info - creating .make-rsync-list)
+$(CCF_UI_VERSION):
+
+.make-ccf-ui-version: $(CCF_UI_VERSION)
+	@> .make-ccf-ui-version
+	@echo "${CCF_UI_VERSION}" >> .make-ccf-ui-version
+
+.make-rsync-list: $(CCF_UI_VERSION)
 	@> .make-rsync-list
 	@$(call add_array_to_file,$(RSYNC_FILE_LIST),.make-rsync-list)
 
+clean:
+	@rm -rf .make-*
+	@rm -rf ccf-ui
 
 # download the dependencies and build the packages if needed
 .PHONY: dist
-dist:
-ifeq ($(CCF_UI_FOLDER_EXISTS), 1)
-	$(info - ${CCF_UI_FOLDER} already download.)
+dist: .make-ccf-ui-version
+ifeq ($(CCF_UI_DOWNLOADED_VERSION), $(CCF_UI_VERSION))
+	$(info ccf-ui ${CCF_UI_VERSION} is already downloaded.)
 else
-	$(info - downloading ${CCF_UI_FOLDER})
-	@curl -L -o ${CCF_UI_FOLDER}.zip "${RELEASE_LINK}"
-	@unzip -n -qq ${CCF_UI_FOLDER}.zip
-	@rm ${CCF_UI_FOLDER}.zip
+	$(info - downloading ccf-ui ${CCF_UI_VERSION} from ${CCF_UI_ZIP_LINK})
+	@curl -L -o ccf-ui.zip "${CCF_UI_ZIP_LINK}"
+	@unzip -n -qq ccf-ui.zip
+	@rm -rf ccf-ui
+	@mv ccf-ui-* ccf-ui
+	@rm ccf-ui.zip
 endif
 
 # deploy to the given location
