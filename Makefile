@@ -54,10 +54,24 @@ deploy: .make-rsync-list
 	$(info - deploying to ${HRA_INSTALL_DIR})
 	@rsync -ravz --files-from=.make-rsync-list . $(HRA_INSTALL_DIR)
 
+# run dist and deploy with proper uesrs (GNU). only works with root user
+.PHONY: root-install
+root-install:
+	su $(shell stat -c "%U" Makefile) -c "make dist"
+	make deploy
+
+# run dist and deploy with proper uesrs (FreeBSD and MAC OS X). only works with root user
+.PHONY: root-install-alt
+root-install-alt:
+	@su $(shell stat -f '%Su' Makefile) -c "make dist"
+	make deploy
+
 .PHONY: help usage
 help: usage
 usage:
 	@echo "Usage: make [target]"
 	@echo "Available targets:"
-	@echo "  dist                   make sure the dependencies are avaibale (might trigger a download)"
-	@echo "  deploy                 deploy the files to the given location"
+	@echo "  dist                make sure the dependencies are avaibale (might trigger a download)"
+	@echo "  deploy              deploy the files to the given location"
+	@echo "  root-install        install dependencies and deploy to the location as root (will use the proper user for local changes), for GNU systems"
+	@echo "  root-install-alt    install dependencies and deploy to the location as root (will use the proper user for local changes), for FreeBSD and MAC OS X"
