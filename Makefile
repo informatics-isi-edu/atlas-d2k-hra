@@ -1,8 +1,8 @@
 
 # update the following if you're planning to update to a new version
 # make sure to also update the version variable
-CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
-CCF_UI_VERSION=3.7.2
+CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/682548e2031221304d270c7870c590ddc1c7f3cd.zip
+CCF_UI_VERSION=staging-2023-09-18
 
 HRA_INSTALL_DIR=/var/www/html/apps/hra
 
