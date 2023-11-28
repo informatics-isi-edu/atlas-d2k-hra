@@ -7,8 +7,8 @@ This repository has been created for integrating [ccf-ui](https://github.com/hub
 1. First you need to setup some environment variables. The following are the variables and their default values:
 
     ```sh
-    CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.7.2.zip
-    CCF_UI_VERSION=3.7.2
+    CCF_UI_ZIP_LINK=https://github.com/hubmapconsortium/ccf-ui/archive/refs/tags/3.8.1.zip
+    CCF_UI_VERSION=3.8.1
 
     HRA_INSTALL_DIR=/var/wwww/html/apps/hra
     ```

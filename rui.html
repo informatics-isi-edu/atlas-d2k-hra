@@ -28,132 +28,89 @@
     // list of organs that we support.
     const ORGAN_LOOKUP = {
       'http://purl.org/ccf/latest/ccf.owl#VHFLeftKidneyV1.1': {
-        'rui': {
-          'name': 'kidney',
-          'side': 'left',
-          'sex': 'female'
-        },
         'chaise': {
           'name': 'UBERON:0004538',
           'sex': 'Female'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0004538'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHMLeftKidney': {
-        'rui': {
-          'name': 'kidney',
-          'side': 'left',
-          'sex': 'male'
-        },
         'chaise': {
           'name': 'UBERON:0004538',
           'sex': 'Male'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0004538'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHFRightKidneyV1.1': {
-        'rui': {
-          'name': 'kidney',
-          'side': 'right',
-          'sex': 'female'
-        },
         'chaise': {
           'name': 'UBERON:0004539',
           'sex': 'Female'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0004539'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHMRightKidney': {
-        'rui': {
-          'name': 'kidney',
-          'side': 'right',
-          'sex': 'male'
-        },
         'chaise': {
           'name': 'UBERON:0004539',
           'sex': 'Male'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0004539'
       },
       "http://purl.org/ccf/latest/ccf.owl#VHMProstate": {
-        'rui': {
-          'name': 'prostate',
-          'sex': 'male'
-        },
         'chaise': {
           'name': 'UBERON:0002367',
           'sex': 'Male'
-        }
+        },
+        // NOTE the uberon id that RUI recognizes for prostate is different from our internal uberon.
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0000079'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHFLeftUreter': {
-        'rui': {
-          'name': 'ureter',
-          'side': 'left',
-          'sex': 'female'
-        },
         'chaise': {
           'name': 'UBERON:0001223',
           'sex': 'Female'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0001223'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHMLeftUreter': {
-        'rui': {
-          'name': 'ureter',
-          'side': 'left',
-          'sex': 'male'
-        },
         'chaise': {
           'name': 'UBERON:0001223',
           'sex': 'Male'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0001223'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHFRightUreter': {
-        'rui': {
-          'name': 'ureter',
-          'side': 'right',
-          'sex': 'female'
-        },
         'chaise': {
           'name': 'UBERON:0001222',
           'sex': 'Female'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0001222'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHMRightUreter': {
-        'rui': {
-          'name': 'ureter',
-          'side': 'right',
-          'sex': 'Male'
-        },
         'chaise': {
           'name': 'UBERON:0001222',
           'sex': 'Male'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0001222'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHFUterus': {
-        'rui': {
-          'name': 'uterus',
-          'sex': 'female'
-        },
         'chaise': {
           'name': 'UBERON:0000995',
           'sex': 'Female'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0000995'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHFUrinaryBladder': {
-        'rui': {
-          'name': 'urinary bladder',
-          'sex': 'female'
-        },
         'chaise': {
           'name': 'UBERON:0001255',
           'sex': 'Female'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0001255'
       },
       'http://purl.org/ccf/latest/ccf.owl#VHMUrinaryBladder': {
-        'rui': {
-          'name': 'urinary bladder',
-          'sex': 'male'
-        },
         'chaise': {
           'name': 'UBERON:0001255',
           'sex': 'Male'
-        }
+        },
+        'rui_ontology_id': 'http://purl.obolibrary.org/obo/UBERON_0001255'
       }
     };
 
@@ -181,6 +138,13 @@
       if (IN_IFRAME) {
         rui.register = handleRegister;
       }
+
+      // limit the allowed organs to only what we support
+      const organOptions = [];
+      Object.values(ORGAN_LOOKUP).forEach((obj) => {
+        organOptions.push(obj.rui_ontology_id);
+      })
+      rui.organOptions = organOptions;
 
       if (existingValue && typeof existingValue[FIELD_NAMES.FILE] === 'string' && existingValue[FIELD_NAMES.FILE] !== '') {
         fetchExistingData(existingValue[FIELD_NAMES.FILE], rui);
@@ -260,7 +224,7 @@
           if (!org) {
             showAlert('error', 'Please select another organ. We currently do not support the chosen organ.');
           } else {
-            rui.organ = org.rui;
+            rui.organ = data.placement.target;
           }
         }
 
