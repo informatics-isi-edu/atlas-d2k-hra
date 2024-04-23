@@ -52,6 +52,7 @@ endif
 .PHONY: deploy
 deploy: .make-rsync-list
 	$(info - deploying to ${HRA_INSTALL_DIR})
+	@mkdir -p ${HRA_INSTALL_DIR}
 	@rsync -ravz --files-from=.make-rsync-list . $(HRA_INSTALL_DIR)
 
 # run dist and deploy with proper uesrs (GNU). only works with root user
